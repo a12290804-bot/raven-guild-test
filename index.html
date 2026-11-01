@@ -4483,6 +4483,7 @@ const ALLYACT260=allyAct;allyAct=function(p,i){if(p&&p.hp>0&&paralSkip260(p,shor
 const GIVE260=give;give=function(u,k,t,v){const r=GIVE260(u,k,t,v);if(k==='paral'&&u&&u.st&&u.st.paral){u.st.vuln=u.st.vuln&&u.st.vuln.t>t?u.st.vuln:{t:Math.max(1,t||1),v:.15};}return r;};
 const HIT260=hitFoe;hitFoe=function(f,p,m=1,o={}){if(f&&has(f,'evade')&&!o.sureHit240&&Math.random()<.2){blog(f.name+' 閃開了攻擊。');return {d:0,miss:1};}if(f&&has(f,'paral'))m*=1.15;return HIT260(f,p,m,o);};
 if(!STI.paral)STI.paral=['⚡','麻痺'];if(!NEG.includes('paral'))NEG.push('paral');
+const HURT260=hurtAlly;hurtAlly=function(p,raw,...a){if(p&&p.maxhp&&raw>0){const boss=BAT&&(BAT.foes||[]).some(f=>f.boss||F_BOSS260(f));raw=Math.min(raw,p.maxhp*(boss?.75:.55));}return HURT260(p,raw,...a);};function F_BOSS260(f){return !!(FOES[f.k||f.key]&&FOES[f.k||f.key].boss)||RUN&&(RUN.world180||RUN.mem)}
 // v2.6.0 23 職業新技能與第五天賦（新 id，舊 id 不動）
 const NSK260={
 shieldF:{n:'霜羽頂盾',d:'全隊頂盾 2 回合並被保護，自身嘲諷 2 回合。',cd:5,t:'buff',tg:'team',st:['umb',2],also:['taunt',2],fx:'shieldglow'},
