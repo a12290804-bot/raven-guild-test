@@ -4580,8 +4580,8 @@ const MAXREACH260=maxReach;maxReach=function(){const o=MAXREACH260();try{const n
 const FINR260=finishBattle;finishBattle=function(win,...a){try{if(win&&RUN&&!RUN.mem&&!RUN.arena&&!RUN.world180&&(RUN.difficulty210||0)>=1&&BAT&&(BAT.foes||[]).some(f=>f.bossR||f.boss)){const n=RUN.difficulty210,f=RUN.floor,i=CAPS260.indexOf(f);if(i>=0&&i<CAPS260.length-1){S.tierReach260=S.tierReach260||{};S.tierReach260[n]=Math.max(S.tierReach260[n]||9,CAPS260[i+1]);}}}catch(e){}return FINR260(win,...a);};
 {const SAN260=sanitize;sanitize=function(o){const r=SAN260(o);if(r&&o&&o.tierReach260)r.tierReach260=JSON.parse(JSON.stringify(o.tierReach260));return r;};}
 function boss260(f){return !!(f&&(f.bossR||f.boss));}
-function clampSh260(){if(!RUN||!RUN.party)return;for(const p of RUN.party){if(p.sh>0){const cap=Math.round(Math.min((p.maxhp||1)*.4,(p.shR260||0)+(p.maxhp||1)*.2));if(p.sh>cap)p.sh=cap;}}}
-const NR260G=newRound;newRound=function(...a){if(RUN&&RUN.party)for(const p of RUN.party){if(p.sh>0)p.sh=Math.round(p.sh*.85);}const r=NR260G(...a);if(RUN&&RUN.party)for(const p of RUN.party)p.shR260=Math.min(p.sh||0,(p.maxhp||1)*.4);clampSh260();if(BAT)for(const f of BAT.foes||[])if(f.ccDR260>0&&BAT.turn%3===0)f.ccDR260--;return r;};
+function clampSh260(){return;if(!RUN||!RUN.party)return;for(const p of RUN.party){if(p.sh>0){const cap=Math.round(Math.min((p.maxhp||1)*.4,(p.shR260||0)+(p.maxhp||1)*.2));if(p.sh>cap)p.sh=cap;}}}
+const NR260G=newRound;newRound=function(...a){const r=NR260G(...a);if(RUN&&RUN.party)for(const p of RUN.party)p.shR260=Math.min(p.sh||0,(p.maxhp||1)*.4);clampSh260();if(BAT)for(const f of BAT.foes||[])if(f.ccDR260>0&&BAT.turn%3===0)f.ccDR260--;return r;};
 const AA260G=allyAct;allyAct=function(p,...a){const r=AA260G(p,...a);try{clampSh260()}catch(e){}return r;};
 const FA260G=foeAct;foeAct=function(...a){const r=FA260G(...a);try{clampSh260()}catch(e){}return r;};
 const CC260=['stun','paral','bind','freeze','web','charm','terror','sleep'];
@@ -4605,6 +4605,23 @@ function wFix260(){if(!BAT||!RUN||!RUN.world180)return;const f=BAT.foes[0];if(!f
 const FA2_260=foeAct;foeAct=function(f,i){try{wFix260();}catch(e){}return FA2_260(f,i);};
 const NR2_260=newRound;newRound=function(...a){const r=NR2_260(...a);try{wFix260();}catch(e){}return r;};
 trainRoom=TRAINROOM0;trainFight=TRAINFIGHT0;const ROOMPAGE253=roomPage156;roomPage156=function(k,...a){if(k==='train'){if(RUN||BAT)return;S.trainUsed=S.trainUsed||[];return trainRoom();}const rr=ROOMPAGE253(k,...a);if(k==='arena')try{domLock253()}catch(e){}return rr;};
+
+// ===== v2.6.0 全域怪物強度（唯一共用）：依隊伍戰力等級（等級＋裝備＋重生）與污染階 =====
+const GS260={hp:1,atk:1,def:1,turns:{mob:3,elite:6,boss:8,world:7}};
+function role260(f){if(RUN&&RUN.world180)return 'world';if(f.boss||f.bossR||f.chief||(BAT&&(BAT.dom||BAT.chief)))return 'boss';if(f.elite)return 'elite';return 'mob';}
+function monsterScale260(f){if(!f||!RUN||!RUN.party)return;const ph=f.ph||0,first=f.gs260!==ph+1;f.gs260=ph+1;const P=powerLv260(),n=Math.max(0,tier253()),al=RUN.party.filter(p=>p.maxhp),N=Math.max(1,al.length);
+ const php=al.reduce((a,p)=>a+p.maxhp,0)/N,pdef=al.reduce((a,p)=>a+(p.def||0),0)/N,shp=al.reduce((a,p)=>a+(p.maxhp||0)+(p.sh||0),0)/N;
+ const role=role260(f),T=GS260.turns[role]*(1+.06*n),rk={mob:1.1,elite:1.4,boss:1.7,world:2.2}[role],EA=22+P*9.5;
+ const hpF=Math.round(EA*N*.8*T*(1+.12*n)*GS260.hp*(role==='world'?[1,1.2,1.4][Math.min(2,ph)]:1)),atkF=Math.round((pdef*1.25+php*.13+Math.max(0,shp-php)*.25)*rk*(1+.1*n)*GS260.atk),defF=Math.round((8+P*.55)*(1+.05*n)*GS260.def);
+ if(role==='world'?f.maxhp!==f.gsHp260:(first&&f.maxhp<hpF)){f.gsHp260=hpF;const r=f.hp/Math.max(1,f.maxhp);f.maxhp=hpF;f.hp=Math.max(1,Math.round(hpF*Math.min(1,r||1)));if(RUN.world180){RUN.world180.phaseMax200=f.maxhp;RUN.world180.phaseHP200=f.hp;}}
+ if((f.atk||0)<atkF)f.atk=atkF;if((f.def||0)<defF)f.def=defF;if(role==='world'&&f.def>defF*1.6)f.def=Math.round(defF*1.6);f.antiSh260=role==='mob'?0:1;}
+function gsAll260(){if(BAT&&BAT.foes)for(const f of BAT.foes)if(f.hp>0)try{monsterScale260(f)}catch(e){console.warn(e)}}
+const BAT260GS=battle;battle=function(...a){const r=BAT260GS(...a);gsAll260();try{drawBattle()}catch(e){}return r;};
+const WF260GS=wFix260;wFix260=function(){WF260GS();gsAll260();};const NR260GS=newRound;newRound=function(...a){const r=NR260GS(...a);gsAll260();return r;};
+// 首領／精英破盾：命中帶護盾的隊員時先撕掉部分護盾（不限制玩家護盾量）
+const FA260GS=foeAct;foeAct=function(f,i){try{gsAll260();if(f&&f.antiSh260&&f.hp>0&&RUN&&BAT&&BAT.turn%2===0){for(const al of RUN.party.filter(p=>p.hp>0&&p.sh>p.maxhp*.3)){const cut=Math.round(al.sh*.5+f.atk*.5);al.sh=Math.max(0,al.sh-cut);blog(f.name+'「撕盾」：撕開 '+(al.name||'隊員')+' 的護盾 '+cut+'。');}}}catch(e){}return FA260GS(f,i);};
+// 附身：用被附身者真實的攻擊計算（含暴擊與防禦）
+demonRound253=function(){if(!RUN?.demon253||!BAT||(BAT.turn||0)%2)return;const P=RUN.demon253.possessed,al=RUN.party.map((p,i)=>({p,i})).filter(o=>o.p.hp>0);const c=al.filter(o=>!P.includes(o.i));if(!c.length||al.length<2)return;const o=pick(c);P.push(o.i);const tg=pick(al.filter(x=>x!==o));const r=roll(o.p.atk||10,tg.p.def||0,1.2,o.p.crit||.1,false,o.p.cdm||1.6);let d=r.d;const ab=Math.min(tg.p.sh||0,d);tg.p.sh=(tg.p.sh||0)-ab;d-=ab;tg.p.hp=Math.max(1,tg.p.hp-d);blog('附身：'+(o.p.name||'一名隊員')+' 的眼神空了一瞬，轉身打向 '+(tg.p.name||'隊友')+(r.c?'（暴擊）':'')+'（'+r.d+'）。');};
 const VER='v2.6.0-test';
 AUTHOR_ANN155.unshift(['v2.5.1-test',['測試版：補回70張戰鬥特效／狀態圖示與時裝目錄（art/effects/v220、art/costumes）。','新增〈內心的惡魔〉限時活動預告面板（即將開放，僅展示圖片）。','流派試煉套用與主線相同的重生難度強化。','重生前自動備份存檔；重生會讓主線地圖回到第一層、技能依等級重新取得。','萬相套裝 2／4／6 件效果小幅加強；兌換券顯示名稱統一為「混沌券」。']]);AUTHOR_ANN155.unshift(['v2.5.3-test',['第四章〈六芒門前〉移入主線：地窖第 20～24 層，新怪物滑槽蜈蚣、回音籤影、氣閥獵犬；第 22 層管線守衛、第 24 層六角驗印機（含二階段與倒下圖）。調查入口移到地窖入口，大廳按鈕移除。','鍛鍊房回歸，入口在候燈迴廊。','重生不再重置地圖與技能，只推進劇情；重生前仍會備份存檔。','長槍手與白骨先生時裝換成動態圖。','九階慾望難度：我想看你努力、執念、貪慾、惡慾、食慾、色慾、傲慢、墮落、瘋癲，每重生一次開一階；每階有自己的戰鬥規則，前面的階會以殘響疊加。','怪物等級真的會提高數值（防禦、速度、抗性，Lv30 起護盾），重生後怪物生命 ×1.25、攻擊 ×1.15；第四章怪物至少 Lv60。','世界王：最多八人、不限回合，每升一階掉落 +12%。','語嫣房「主宰」：新的三階段與結局；未解鎖時顯示還缺哪幾間。','重生劇情延長，各階慾望有不同的低語與事件。','〈內心的惡魔〉限時活動開放：活動與巡夜卡片進入，每天三次，異界點可換時裝與套裝。','回憶房改用首領記錄，補上地址之門、第四章與白鐵礦城的領主。']]);
 AUTHOR_ANN155.unshift(['v2.6.0-test',['怪物等級真正生效：等級跟隨隊伍（精英+2、首領+3），生命／攻擊／防禦依等級成長；第四章最低 Lv60。','九階慾望難度倍率改為取代舊難度加成（不再疊乘），單次受擊上限防止滿血秒殺。','污染技能整合為八層專屬技能；修正封印、閃避、狂怒、侵蝕 NaN，新增狀態「麻痺」。','23 位職業各新增一招 Lv15 技能與 Lv30 天賦「異界回聲」：帶回標記、恐懼、影步、掩護、頂盾，並加入禁療與麻痺。','新套裝「污染・八相」「管線」，22 組舊套裝加上狀態效果，16 件新橘字（含 8 件污染裝備）；舊裝備全部保留。']]);
