@@ -4611,8 +4611,8 @@ const GS260={hp:1,atk:1,def:1,turns:{mob:3,elite:6,boss:8,world:7}};
 function role260(f){if(RUN&&RUN.world180)return 'world';if(f.boss||f.bossR||f.chief||(BAT&&(BAT.dom||BAT.chief)))return 'boss';if(f.elite)return 'elite';return 'mob';}
 function monsterScale260(f){if(!f||!RUN||!RUN.party)return;const ph=f.ph||0,first=f.gs260!==ph+1;f.gs260=ph+1;const P=powerLv260(),n=Math.max(0,tier253()),al=RUN.party.filter(p=>p.maxhp),N=Math.max(1,al.length);
  const php=al.reduce((a,p)=>a+p.maxhp,0)/N,pdef=al.reduce((a,p)=>a+(p.def||0),0)/N,shp=al.reduce((a,p)=>a+(p.maxhp||0)+(p.sh||0),0)/N;
- const role=role260(f),T=GS260.turns[role]*(1+.06*n),rk={mob:1.1,elite:1.4,boss:1.7,world:2.2}[role],EA=22+P*9.5;
- const hpF=Math.round(EA*N*.8*T*(1+.12*n)*GS260.hp*(role==='world'?[1,1.2,1.4][Math.min(2,ph)]:1)),atkF=Math.round((pdef*1.25+php*.13+Math.max(0,shp-php)*.25)*rk*(1+.1*n)*GS260.atk),defF=Math.round((8+P*.55)*(1+.05*n)*GS260.def);
+ const rbP=RUN.party.some(q=>{const h=S.heroes.find(x=>x.id===q.id);return h&&rb210(h)>0}),soft=rbP||n>0?1:.6;const role=role260(f),T=GS260.turns[role]*(1+.06*n),rk={mob:1.1,elite:1.4,boss:1.7,world:2.2}[role],EA=22+P*9.5;
+ const hpF=Math.round(EA*N*.8*T*(1+.12*n)*soft*GS260.hp*(role==='world'?[1,1.2,1.4][Math.min(2,ph)]:1)),atkF=Math.round((pdef*1.25+php*.13+Math.max(0,shp-php)*.25)*rk*(1+.1*n)*soft*GS260.atk),defF=Math.round((8+P*.55)*(1+.05*n)*GS260.def);
  if(role==='world'?f.maxhp!==f.gsHp260:(first&&f.maxhp<hpF)){f.gsHp260=hpF;const r=f.hp/Math.max(1,f.maxhp);f.maxhp=hpF;f.hp=Math.max(1,Math.round(hpF*Math.min(1,r||1)));if(RUN.world180){RUN.world180.phaseMax200=f.maxhp;RUN.world180.phaseHP200=f.hp;}}
  if((f.atk||0)<atkF)f.atk=atkF;if((f.def||0)<defF)f.def=defF;if(role==='world'&&f.def>defF*1.6)f.def=Math.round(defF*1.6);f.antiSh260=role==='mob'?0:1;}
 function gsAll260(){if(BAT&&BAT.foes)for(const f of BAT.foes)if(f.hp>0)try{monsterScale260(f)}catch(e){console.warn(e)}}
@@ -4622,8 +4622,45 @@ const WF260GS=wFix260;wFix260=function(){WF260GS();gsAll260();};const NR260GS=ne
 const FA260GS=foeAct;foeAct=function(f,i){try{gsAll260();if(f&&f.antiSh260&&f.hp>0&&RUN&&BAT&&BAT.turn%2===0){for(const al of RUN.party.filter(p=>p.hp>0&&p.sh>p.maxhp*.3)){const cut=Math.round(al.sh*.5+f.atk*.5);al.sh=Math.max(0,al.sh-cut);blog(f.name+'「撕盾」：撕開 '+(al.name||'隊員')+' 的護盾 '+cut+'。');}}}catch(e){}return FA260GS(f,i);};
 // 附身：用被附身者真實的攻擊計算（含暴擊與防禦）
 demonRound253=function(){if(!RUN?.demon253||!BAT||(BAT.turn||0)%2)return;const P=RUN.demon253.possessed,al=RUN.party.map((p,i)=>({p,i})).filter(o=>o.p.hp>0);const c=al.filter(o=>!P.includes(o.i));if(!c.length||al.length<2)return;const o=pick(c);P.push(o.i);const tg=pick(al.filter(x=>x!==o));const r=roll(o.p.atk||10,tg.p.def||0,1.2,o.p.crit||.1,false,o.p.cdm||1.6);let d=r.d;const ab=Math.min(tg.p.sh||0,d);tg.p.sh=(tg.p.sh||0)-ab;d-=ab;tg.p.hp=Math.max(1,tg.p.hp-d);blog('附身：'+(o.p.name||'一名隊員')+' 的眼神空了一瞬，轉身打向 '+(tg.p.name||'隊友')+(r.c?'（暴擊）':'')+'（'+r.d+'）。');};
-const VER='v2.6.0-test';
-AUTHOR_ANN155.unshift(['v2.5.1-test',['測試版：補回70張戰鬥特效／狀態圖示與時裝目錄（art/effects/v220、art/costumes）。','新增〈內心的惡魔〉限時活動預告面板（即將開放，僅展示圖片）。','流派試煉套用與主線相同的重生難度強化。','重生前自動備份存檔；重生會讓主線地圖回到第一層、技能依等級重新取得。','萬相套裝 2／4／6 件效果小幅加強；兌換券顯示名稱統一為「混沌券」。']]);AUTHOR_ANN155.unshift(['v2.5.3-test',['第四章〈六芒門前〉移入主線：地窖第 20～24 層，新怪物滑槽蜈蚣、回音籤影、氣閥獵犬；第 22 層管線守衛、第 24 層六角驗印機（含二階段與倒下圖）。調查入口移到地窖入口，大廳按鈕移除。','鍛鍊房回歸，入口在候燈迴廊。','重生不再重置地圖與技能，只推進劇情；重生前仍會備份存檔。','長槍手與白骨先生時裝換成動態圖。','九階慾望難度：我想看你努力、執念、貪慾、惡慾、食慾、色慾、傲慢、墮落、瘋癲，每重生一次開一階；每階有自己的戰鬥規則，前面的階會以殘響疊加。','怪物等級真的會提高數值（防禦、速度、抗性，Lv30 起護盾），重生後怪物生命 ×1.25、攻擊 ×1.15；第四章怪物至少 Lv60。','世界王：最多八人、不限回合，每升一階掉落 +12%。','語嫣房「主宰」：新的三階段與結局；未解鎖時顯示還缺哪幾間。','重生劇情延長，各階慾望有不同的低語與事件。','〈內心的惡魔〉限時活動開放：活動與巡夜卡片進入，每天三次，異界點可換時裝與套裝。','回憶房改用首領記錄，補上地址之門、第四章與白鐵礦城的領主。']]);
+// ===== v2.7.0 技能・分支・天賦・裝備重製（依 v270_skill_design / v270_gear_design） =====
+const UNLK270=[50,55,60,65,70,75,80];
+function blv270(h){return rb210(h)?80:h.lv;}
+function brLock270(h,k){const i=avail(h).indexOf(k);return i<0?50:UNLK270[Math.min(i,6)];}
+const SK270=skill180;skill180=function(p,k){const h=S.heroes.find(x=>x.id===p.id);if(h&&(h.skillBranches210?.[k]||0)&&blv270(h)<brLock270(h,k))return SK241(p,k);const s=SK270(p,k);try{if(s&&h&&rb210(h)&&tier253()>=6&&s.cd>1)return {...s,cd:s.cd-1};}catch(e){}return s;};
+const SETBR270=setSkillBranch210;setSkillBranch210=function(id,k,b){const h=S.heroes.find(x=>x.id===id);if(h&&b>0){if(blv270(h)<brLock270(h,k))return toast('此技能分支 Lv'+brLock270(h,k)+' 開放');const same=avail(h).filter(x=>x!==k&&(h.skillBranches210?.[x]||0)===b).length;if(same>=(b===1?2:3))return toast('互斥：同一種分支最多選 '+(b===1?2:3)+' 個技能');}return SETBR270(id,k,b);};
+const SBM270=skillBranchMenu210;skillBranchMenu210=function(id){SBM270(id);try{const h=S.heroes.find(x=>x.id===id),m=$('modal')||document;const p=m.querySelector('p');if(p&&h)p.innerHTML='技能分支逐步開放：第1～7個技能依序於 Lv50／55／60／65／70／75／80 開放（重生角色全開）。互斥：第一分支最多2個技能、其他分支最多3個技能。整備可免費切換。';}catch(e){}};
+// 連段與跨職業：鋪陳的狀態由隊友或自己施加，收割者對該狀態加傷
+const PAY270={shieldF:[['blind',1.3]],shieldM:[['brk',1.2]],shield0:[['mark',1.2]],knightW:[['hcut',1.2]],bone:[['paral',1.3]],tiekou:[['seal',1.2]],spear:[['mark',1.3]],horn:[['terror',1.2],['bleed',1.1]],dragon:[['erode',1.15]],raven:[['prey',1.15],['lit',1.15]],spider:[['bind',1.15],['paral',1.15]],archerH:[['poison',1.15]],mageF:[['lit',1.2],['paral',1.1]],mageM:[['burn',1.15]],mage0:[['poison',1.2],['erode',1.1]],foxgirl:[['charm',1.25]],fox:[['mark',1.2]],healerF:[['poison',1.1]],healer1:[['poison',1.15]],herb:[['paral',1.1]],snake:[['bind',1.2]],baigu:[['terror',1.25]],luoqingluan:[['burn',1.1],['seal',1.15]]};
+function setPieces270(h){const c={};for(const it of Object.values(h?.eq||{}))if(it&&it.set)c[it.set]=(c[it.set]||0)+1;return Math.max(0,...Object.values(c));}
+function bossP270(h){let v=0;for(const it of Object.values(h?.eq||{}))if(it&&it.x&&it.x.bossP)v+=it.x.bossP;return v;}
+const HIT270=hitFoe;hitFoe=function(f,p,m=1,o={}){try{if(f&&p&&p.key&&RUN&&RUN.party&&RUN.party.includes(p)){const h=S.heroes.find(x=>x.id===p.id);let k=1;for(const [st,x]of PAY270[p.key]||[])if(has(f,st))k*=x;if(has(f,'mark')&&!(PAY270[p.key]||[]).some(a=>a[0]==='mark'))k*=1.1;if(p.key==='shield0'&&p.hp<p.maxhp*.3)k*=1.3;
+ const sp=setPieces270(h),neg=Object.keys(f.st||{}).some(s=>NEG instanceof Set?NEG.has(s):!!(NEG&&NEG[s]));if(sp>=4&&neg)k*=1.15;if(sp>=6)k*=1.1;
+ if(f.boss||f.bossR||f.elite||(BAT&&(BAT.dom||BAT.chief)))k*=1+bossP270(h);
+ if(h&&rb210(h)&&o.skill){const n=tier253();if(n>=3)k*=1.3;if(n>=5&&p.hp<p.maxhp*.4)k*=1.25;if(n>=7&&!p.first270){p.first270=1;o={...o,crit:1};}}
+ m*=k;const r=HIT270(f,p,m,o);
+ if(h&&rb210(h)&&o.skill&&f.hp>0){const n=tier253();if(n>=1&&Math.random()<.25)give(f,'slow',2);if(n>=5&&p.hp<p.maxhp*.4)give(f,'burn',2);if(n>=7)give(f,'vuln',2);}
+ if(p.key==='knightW'&&has(f,'hcut')&&r&&r.d)p.hp=Math.min(p.maxhp,p.hp+Math.round(r.d*.1));
+ if(p.key==='herb'&&has(f,'paral')&&has(f,'poison')&&f.hp>0)give(f,'poison',3,p.atk*.06);
+ return r;}}catch(e){console.warn(e)}return HIT270(f,p,m,o);};
+// 中毒上限6（蕁+2）；毒爆：禁療2回合，≥5層40%麻痺，領主×0.7
+const GIVE270=give;give=function(u,k,t,v,...a){const old=k==='poison'&&has(u,'poison')?(u.st.poison.stacks212||1):0;const r=GIVE270(u,k,t,v,...a);try{if(k==='poison'&&u.st?.poison&&old>=5){const src=window.__statusSource156;const cap=6+(src&&(src.key==='healer1'||src.key==='archerH')?2:0);const p=u.st.poison;p.stacks212=Math.min(cap,old+1);p.v=(p.base212||p.v)*(1+.35*(p.stacks212-1));}}catch(e){}return r;};
+const BM270=burstMultiplier212;burstMultiplier212=function(f,p,o){const s=SK[o.skillKey200]||{},k=burstRule212(s),n=k==='poison'?stack212(f,'poison'):0;let r=BM270(f,p,o);if(k==='poison'&&n>=3&&r>1){r=1+(r-1)*(f.boss||f.bossR?.7:1)+.06*Math.max(0,n-5);try{give(f,'hcut',2);if(n>=5&&Math.random()<.4)give(f,'paral',1);blog('毒爆！禁療'+(n>=5?'，嘗試麻痺':'')+'。');}catch(e){}}return r;};
+// 污染代價：第3階起每場開始失去3%生命
+const BAT270=battle;battle=function(...a){const r=BAT270(...a);try{if(RUN&&RUN.party&&tier253()>=2)for(const p of RUN.party){const h=S.heroes.find(x=>x.id===p.id);if(h&&rb210(h)&&p.hp>0){p.hp=Math.max(1,Math.round(p.hp-p.maxhp*.03));p.first270=0;}}}catch(e){}return r;};
+// 裝備：新詞條、史詩橘字縮小、特色／傳說隨等級重算（只升不降）
+XN.bossP='領主傷害增強';XR.bossP=.03;
+for(const [id,u]of Object.entries(UQ))if(u&&u.ep&&!u.myth180&&u.fx&&!u.fx270){u.fx270=1;for(const k in u.fx)if(typeof u.fx[k]==='number'&&!/Cap$|N$/.test(k))u.fx[k]=+(u.fx[k]*.7).toFixed(3);}
+const FIX270=fixItem;fixItem=function(o){const it=FIX270(o);try{if(it&&it.uq&&UQ[it.uq]&&!UQ[it.uq].ep&&!UQ[it.uq].myth180&&!it.rc270&&(it.ilv||0)>20){const u=UQ[it.uq],g=u.leg?.005:.015,mul=1+g*(it.ilv-20);it.atk=Math.max(it.atk||0,Math.round((it.atk||0)*mul));it.def=Math.max(it.def||0,Math.round((it.def||0)*mul));it.rc270=1;}}catch(e){}return it;};
+// 洗練：詞條與基礎數值一起重骰（全隨機池）
+const RD270=refineDo;refineDo=function(u){const f=findIt(u),it=f&&f.it,b=it&&{atk:it.atk,def:it.def,x:JSON.stringify(it.x||{})};const r=RD270(u);try{if(it&&b.x!==JSON.stringify(it.x||{})){if(!it.base270)it.base270={atk:b.atk,def:b.def};for(const k of ['atk','def'])if(it.base270[k])it[k]=Math.round(it.base270[k]*(.9+Math.random()*.25));save();}}catch(e){}return r;};
+// 淬煉：另從完整詞條池（含領主傷害增強）抽一條
+const TD270=temperDo;temperDo=function(u,k){const f=findIt(u),before=f&&f.it.tem;const r=TD270(u,k);try{if(f&&!before&&f.it.tem){const it=f.it;it.x=it.x||{};const nk=pick(Object.keys(XN));it.x[nk]=+((it.x[nk]||0)+XR[nk]*(rnd(5,10)/10)*Math.max(1,it.t)).toFixed(3);save();}}catch(e){}return r;};
+
+// v2.7.0 樂子點／異界點收益提升：完成 +40%，未完成／失敗 +60%
+function rew270(fn,winIdx){return function(...a){const f0=S.fun180||0,d0=S.demon253?.pts||0;const r=fn(...a);try{const win=!!a[winIdx];const k=win?.4:.6;const df=(S.fun180||0)-f0,dd=(S.demon253?.pts||0)-d0;if(df>0)S.fun180=Math.round((S.fun180||0)+df*k);if(dd>0&&S.demon253)S.demon253.pts=Math.round(S.demon253.pts+dd*k);if(df>0||dd>0){toast('v2.7 收益加成 +'+Math.round(k*100)+'%');save();}}catch(e){}return r;};}
+finishWorld180=rew270(finishWorld180,0);finishBattle=rew270(finishBattle,0);
+const VER='v2.7.0-test';
+AUTHOR_ANN155.unshift(['v2.7.0-test',['技能分支 Lv50～80 逐步開放並互斥；連段與跨職業狀態搭配（標記、流血、中毒、麻痺、恐懼…）。','中毒上限6層（蕁／鳶8層），毒爆附禁療與麻痺。','污染階對重生角色的技能變化與代價。','怪物強度依隊伍戰力（等級＋裝備＋重生）與污染統一提升；取消護盾上限。','樂子點與異界點收益提高：完成 +40%、未完成／失敗 +60%。','裝備：新詞條「領主傷害增強」；史詩保留較小的特殊效果；特色／傳說隨等級重算（只升不降）；洗練含基礎數值；淬煉追加隨機詞條。']]);AUTHOR_ANN155.unshift(['v2.5.1-test',['測試版：補回70張戰鬥特效／狀態圖示與時裝目錄（art/effects/v220、art/costumes）。','新增〈內心的惡魔〉限時活動預告面板（即將開放，僅展示圖片）。','流派試煉套用與主線相同的重生難度強化。','重生前自動備份存檔；重生會讓主線地圖回到第一層、技能依等級重新取得。','萬相套裝 2／4／6 件效果小幅加強；兌換券顯示名稱統一為「混沌券」。']]);AUTHOR_ANN155.unshift(['v2.5.3-test',['第四章〈六芒門前〉移入主線：地窖第 20～24 層，新怪物滑槽蜈蚣、回音籤影、氣閥獵犬；第 22 層管線守衛、第 24 層六角驗印機（含二階段與倒下圖）。調查入口移到地窖入口，大廳按鈕移除。','鍛鍊房回歸，入口在候燈迴廊。','重生不再重置地圖與技能，只推進劇情；重生前仍會備份存檔。','長槍手與白骨先生時裝換成動態圖。','九階慾望難度：我想看你努力、執念、貪慾、惡慾、食慾、色慾、傲慢、墮落、瘋癲，每重生一次開一階；每階有自己的戰鬥規則，前面的階會以殘響疊加。','怪物等級真的會提高數值（防禦、速度、抗性，Lv30 起護盾），重生後怪物生命 ×1.25、攻擊 ×1.15；第四章怪物至少 Lv60。','世界王：最多八人、不限回合，每升一階掉落 +12%。','語嫣房「主宰」：新的三階段與結局；未解鎖時顯示還缺哪幾間。','重生劇情延長，各階慾望有不同的低語與事件。','〈內心的惡魔〉限時活動開放：活動與巡夜卡片進入，每天三次，異界點可換時裝與套裝。','回憶房改用首領記錄，補上地址之門、第四章與白鐵礦城的領主。']]);
 AUTHOR_ANN155.unshift(['v2.6.0-test',['怪物等級真正生效：等級跟隨隊伍（精英+2、首領+3），生命／攻擊／防禦依等級成長；第四章最低 Lv60。','九階慾望難度倍率改為取代舊難度加成（不再疊乘），單次受擊上限防止滿血秒殺。','污染技能整合為八層專屬技能；修正封印、閃避、狂怒、侵蝕 NaN，新增狀態「麻痺」。','23 位職業各新增一招 Lv15 技能與 Lv30 天賦「異界回聲」：帶回標記、恐懼、影步、掩護、頂盾，並加入禁療與麻痺。','新套裝「污染・八相」「管線」，22 組舊套裝加上狀態效果，16 件新橘字（含 8 件污染裝備）；舊裝備全部保留。']]);
 AUTHOR_ANN155.unshift(['v2.5.2-test',['測試版改用獨立存檔（RG_TEST_ 開頭），第一次開啟會複製正式版存檔，之後不會再寫回正式版。','〈內心的惡魔〉預告移到主畫面橫幅與「三房・傳送門・活動」裡。','重生頁說明改成新規則。']]);const ANN=AUTHOR_ANN155;
 function annSeen(){try{return RGLS.getItem('rg_ann')===VER}catch(e){return true}}
