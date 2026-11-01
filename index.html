@@ -4657,10 +4657,74 @@ const RD270=refineDo;refineDo=function(u){const f=findIt(u),it=f&&f.it,b=it&&{at
 const TD270=temperDo;temperDo=function(u,k){const f=findIt(u),before=f&&f.it.tem;const r=TD270(u,k);try{if(f&&!before&&f.it.tem){const it=f.it;it.x=it.x||{};const nk=pick(Object.keys(XN));it.x[nk]=+((it.x[nk]||0)+XR[nk]*(rnd(5,10)/10)*Math.max(1,it.t)).toFixed(3);save();}}catch(e){}return r;};
 
 // v2.7.0 樂子點／異界點收益提升：完成 +40%，未完成／失敗 +60%
-function rew270(fn,winIdx){return function(...a){const f0=S.fun180||0,d0=S.demon253?.pts||0;const r=fn(...a);try{const win=!!a[winIdx];const k=win?.4:.6;const df=(S.fun180||0)-f0,dd=(S.demon253?.pts||0)-d0;if(df>0)S.fun180=Math.round((S.fun180||0)+df*k);if(dd>0&&S.demon253)S.demon253.pts=Math.round(S.demon253.pts+dd*k);if(df>0||dd>0){toast('v2.7 收益加成 +'+Math.round(k*100)+'%');save();}}catch(e){}return r;};}
+function rew270(fn,winIdx){return function(...a){if(window.__rew270)return fn(...a);window.__rew270=1;try{const f0=S.fun180||0,d0=S.demon253?.pts||0;const r=fn(...a);try{const win=!!a[winIdx];const k=win?.4:.6;const df=(S.fun180||0)-f0,dd=(S.demon253?.pts||0)-d0;if(df>0)S.fun180=Math.round((S.fun180||0)+df*k);if(dd>0&&S.demon253)S.demon253.pts=Math.round(S.demon253.pts+dd*k);if(df>0||dd>0){toast('v2.7 收益加成 +'+Math.round(k*100)+'%');save();}}catch(e){}return r;}finally{window.__rew270=0;}};}
 finishWorld180=rew270(finishWorld180,0);finishBattle=rew270(finishBattle,0);
+// ===== v2.7.0 第二批：天賦重寫、分支三型、流派印記、Lv75/80 終極、重鑄券、污染5/9階、6件套連動 =====
+// 天賦（Lv13 收割型、Lv20 機制型），寫入原本天賦欄
+const TAL270={shieldF:[['致盲迎擊','對致盲敵傷害 +30%',[['blind',1.3]]],['羽幕回護','代受成功回復 3% 生命；被打時 25% 致盲攻擊者',null,'blindBack']],
+shieldM:[['破甲重擊','對破甲敵傷害 +25%',[['brk',1.25]]],['震地','盾擊命中破甲敵時 30% 麻痺',null,'paralBrk']],
+shield0:[['搏命','對標記敵 +20%；殘血 30% 以下再 +30%',[['mark',1.2]]],['加價','擊倒敵人後下一擊必暴擊',null,'killCrit']],
+knightW:[['審判','對禁療敵 +25%，命中回復傷害 10%',[['hcut',1.25]]],['庇護','施技命中時 20% 機率淨化一名隊友',null,'cleanse']],
+bone:[['反震','對麻痺敵 +30%',[['paral',1.3]]],['棘殼','命中附加侵蝕 1 層',null,'erodeHit']],
+tiekou:[['扣鎖','對封印敵 +20%',[['seal',1.2]]],['白鐵頂扣','對有護盾的敵人 +30%',null,'antiSh']],
+spear:[['龍膽','對標記敵 +30%、對流血敵 +10%',[['mark',1.3],['bleed',1.1]]],['架槍','命中後 25% 機率對目標施加易傷',null,'vulnHit']],
+horn:[['狂衝','對恐懼敵 +25%',[['terror',1.25]]],['戰吼','擊倒敵人時全隊獲得強化 2 回合',null,'killMight']],
+dragon:[['焚鱗','對侵蝕敵 +20%',[['erode',1.2]]],['逆鱗','生命低於 40% 時傷害 +25%',null,'lowHp']],
+raven:[['啄心','對獵物與標記敵各 +15%（可加乘）',[['prey',1.15],['mark',1.15]]],['鴉群','對照明敵 +20%',[['lit',1.2]]]],
+spider:[['縛絲','對束縛／麻痺敵 +20%',[['bind',1.2],['paral',1.2]]],['共享','命中連結敵時 25% 複製一個負面狀態給另一敵',null,'shareNeg']],
+archerH:[['毒羽','對中毒敵 +20%',[['poison',1.2]]],['處決','對生命 30% 以下敵人必暴擊',null,'exec']],
+mageF:[['照影','對照明敵 +25%',[['lit',1.25]]],['雷引','對照明敵命中 25% 麻痺',null,'litParal']],
+mageM:[['炎祭','對燃燒敵 +20%',[['burn',1.2]]],['殘毒轉燃','命中中毒敵時附加燃燒',null,'poisonBurn']],
+mage0:[['疫咒','對中毒敵 +25%、侵蝕敵 +15%',[['poison',1.25],['erode',1.15]]],['咒爆傳染','擊倒敵人時延爆咒印傳給下一隻',null,'doomJump']],
+foxgirl:[['緋燈','對魅惑敵 +30%',[['charm',1.3]]],['幻步','命中 20% 魅惑目標',null,'charmHit']],
+fox:[['嗅標','對標記敵 +25%',[['mark',1.25]]],['狐火回春','擊倒時全隊回復 5% 生命',null,'killHeal']],
+healerF:[['苦艾','對中毒敵 +15%',[['poison',1.15]]],['淨化再生','施技命中時 20% 淨化一名隊友',null,'cleanse']],
+healer1:[['以毒養醫','對中毒敵 +20%；中毒上限 +2',[['poison',1.2]]],['禁藥','命中中毒敵時附加禁療',null,'poisonHcut']],
+herb:[['麻草','對麻痺敵 +20%',[['paral',1.2]]],['長歪的苔','命中麻痺敵追加中毒',null,'paralPoison']],
+snake:[['絞纏','對束縛敵 +25%',[['bind',1.25]]],['蛇牙半爆','命中中毒 3 層以上敵人時追加 30% 傷害',null,'halfBurst']],
+baigu:[['恐偶','對恐懼敵 +30%',[['terror',1.3]]],['傀儡驚魂','擊倒敵人時恐懼全場 1 回合',null,'killTerror']],
+luoqingluan:[['封焰','對燃燒／封印敵 +15%',[['burn',1.15],['seal',1.15]]],['淨火轉盾','淨化或治療時給目標 5% 生命護盾',null,'healSh']]};
+const TM270={};for(const [k,L]of Object.entries(TAL270)){const c=CHR[k];if(!c||!c.tal)continue;L.forEach(([n,d,pay,mech],j)=>{const i=2+j,t=c.tal[i];if(!t)return;t[2]=n;t[3]=d;TM270[t[1]]={pay,mech};});}
+function mechs270(p){const out=new Set(),pay=[];for(const id of p.tal||[]){const m=TM270[id];if(!m)continue;if(m.pay)pay.push(...m.pay);if(m.mech)out.add(m.mech);}return {out,pay};}
+// 分支三型：1 強化、2 轉化、3 連動
+const CONV270={shieldF:'blind',shieldM:'brk',shield0:'mark',knightW:'hcut',bone:'paral',tiekou:'seal',spear:'erode',horn:'terror',dragon:'erode',raven:'mark',spider:'paral',archerH:'poison',mageF:'freeze',mageM:'burn',mage0:'doom',foxgirl:'charm',fox:'mark',healerF:'poison',healer1:'poison',herb:'paral',snake:'bind',baigu:'terror',luoqingluan:'seal'};
+function style270(h){const c=[0,0,0,0];avail(h).forEach(k=>c[h.skillBranches210?.[k]||0]++);const b=[1,2,3].sort((a,x)=>c[x]-c[a])[0];return blv270(h)>=60&&c[b]>0?b:0;}
+const STYN270=['','強化印記：技能傷害 +10%','轉化印記：施加狀態時 20% 追加易傷','連動印記：連動加成 20%→35%'];
+const ULT270=['','終結技：對生命 30% 以下敵人技能 ×1.5','常駐光環：全隊傷害 +8%'],FIN270=['','爆發：暴擊時傷害再 +20%','持久：受到傷害 -10%'];
+function recast270(id){const h=S.heroes.find(x=>x.id===id);if(!h||!idle180()||(S.recast270||0)<1)return toast('需要重鑄券');S.recast270--;h.ult270=0;h.fin270=0;h.skillBranches210={};save();skillBranchMenu210(id);}
+function pickUlt270(id,w,v){const h=S.heroes.find(x=>x.id===id);if(!h||!idle180())return;if(w==='u'){if(blv270(h)<75||h.ult270)return;h.ult270=v;}else{if(blv270(h)<80||h.fin270)return;h.fin270=v;}save();skillBranchMenu210(id);}
+const SBM270B=skillBranchMenu210;skillBranchMenu210=function(id){SBM270B(id);try{const h=S.heroes.find(x=>x.id===id),m=document.querySelector('#modal .box')||document.querySelector('#modal')||document.body;if(!h)return;
+ m.querySelectorAll('.branch-card241 b').forEach(b=>{const t=b.textContent;const i=[...b.closest('details').querySelectorAll('.branch-card241')].indexOf(b.closest('.branch-card241'));if(i>0)b.textContent=['','強化・','轉化・','連動・'][i]+t;});
+ const st=style270(h),ub=(v)=>`<button class="btn small ${h.ult270===v?'primary':''}" ${blv270(h)<75||h.ult270?'disabled':''} onclick="pickUlt270(${id},'u',${v})">${ULT270[v]}</button>`,fb=(v)=>`<button class="btn small ${h.fin270===v?'primary':''}" ${blv270(h)<80||h.fin270?'disabled':''} onclick="pickUlt270(${id},'f',${v})">${FIN270[v]}</button>`;
+ const html=`<section class="q style270"><h3>流派與終極（Lv60／75／80）</h3><p>分支型：強化＝數值；轉化＝技能改附「${(STI[CONV270[h.key]]||[])[1]||'職業狀態'}」；連動＝施放後下一個不同技能加成。</p><p>流派印記（Lv60，依最多的分支型自動判定）：<b>${st?STYN270[st]:'未達成'}</b></p><p>Lv75 終極（選後鎖定）：${ub(1)} ${ub(2)}</p><p>Lv80 終極（選後鎖定）：${fb(1)} ${fb(2)}</p><p class="note">重鑄券 ${S.recast270||0} 張：重置分支與終極。回憶房／活動首領勝利有機率掉落。</p><button class="btn small" ${(S.recast270||0)<1?'disabled':''} onclick="recast270(${id})">使用重鑄券</button></section>`;
+ const back=[...m.querySelectorAll('button')].find(b=>/返回角色/.test(b.textContent));if(back)back.insertAdjacentHTML('beforebegin',html);else m.insertAdjacentHTML('beforeend',html);}catch(e){console.warn(e)}};
+// 6 件套專屬連動
+const SET6_270={venom:[['poison',1.25]],blood:[['bleed',1.25],['mark',1.1]],stampS:[['mark',1.25]],frost:[['freeze',1.3],['slow',1.1]],ember:[['burn',1.25]],rend:[['brk',1.25]],night:[['blind',1.2]],thorn:[['paral',1.2]]};
+function setCount270(h){const c={};for(const it of Object.values(h?.eq||{}))if(it&&it.set)c[it.set]=(c[it.set]||0)+1;return c;}
+const HIT270B=hitFoe;hitFoe=function(f,p,m=1,o={}){try{if(f&&p&&RUN&&RUN.party&&RUN.party.includes(p)){const h=S.heroes.find(x=>x.id===p.id);const {out,pay}=mechs270(p);let k=1;for(const [st,x]of pay)if(has(f,st))k*=x;
+ if(out.has('lowHp')&&p.hp<p.maxhp*.4)k*=1.25;if(out.has('antiSh')&&f.sh>0)k*=1.3;if(out.has('halfBurst')&&has(f,'poison')&&(f.st.poison.stacks212||1)>=3)k*=1.3;if(p.killCrit270){o={...o,crit:1};p.killCrit270=0;}if(out.has('exec')&&f.hp<f.maxhp*.3)o={...o,crit:1};
+ if(h){const sc=setCount270(h);for(const [sid,L]of Object.entries(SET6_270))if((sc[sid]||0)>=6)for(const [st,x]of L)if(has(f,st))k*=x;
+  const sk=o.skillKey200,br=sk?(h.skillBranches210?.[sk]||0):0,sty=style270(h);if(o.skill){if(sty===1)k*=1.1;if(p.link270&&p.link270.k!==sk&&BAT.turn-p.link270.t<=2){k*=sty===3?1.35:1.2;p.link270=null;}if(br===3)p.link270={k:sk,t:BAT.turn};if(h.ult270===1&&f.hp<f.maxhp*.3)k*=1.5;}
+  if(RUN.party.some(q=>{const hh=S.heroes.find(x=>x.id===q.id);return hh&&hh.ult270===2&&q.hp>0}))k*=1.08;
+  m*=k;const r=HIT270B(f,p,m,o);
+  if(r&&r.c&&h.fin270===1&&r.d&&f.hp>0){const e=Math.round(r.d*.2);f.hp-=e;}
+  if(o.skill&&br===2&&f.hp>0&&CONV270[p.key])give(f,CONV270[p.key],2,p.atk*.2);if(sty===2&&o.skill&&f.hp>0&&Math.random()<.2)give(f,'vuln',2);
+  if(f.hp>0){if(out.has('paralBrk')&&has(f,'brk')&&Math.random()<.3)give(f,'paral',1);if(out.has('erodeHit'))give(f,'erode',3);if(out.has('vulnHit')&&Math.random()<.25)give(f,'vuln',2);if(out.has('litParal')&&has(f,'lit')&&Math.random()<.25)give(f,'paral',1);if(out.has('poisonBurn')&&has(f,'poison'))give(f,'burn',2);if(out.has('charmHit')&&Math.random()<.2)give(f,'charm',1);if(out.has('poisonHcut')&&has(f,'poison'))give(f,'hcut',2);if(out.has('paralPoison')&&has(f,'paral'))give(f,'poison',3,p.atk*.06);
+   if(out.has('shareNeg')&&has(f,'link')&&Math.random()<.25){const o2=BAT.foes.find(x=>x!==f&&x.hp>0);const s2=Object.keys(f.st).find(s=>s!=='link'&&NEG&&(NEG instanceof Set?NEG.has(s):NEG[s]));if(o2&&s2)give(o2,s2,2);}}
+  else{if(out.has('killCrit'))p.killCrit270=1;if(out.has('killMight'))RUN.party.forEach(q=>q.hp>0&&give(q,'might',2));if(out.has('killHeal'))RUN.party.forEach(q=>{if(q.hp>0)q.hp=Math.min(q.maxhp,q.hp+Math.round(q.maxhp*.05))});if(out.has('killTerror'))BAT.foes.forEach(x=>x.hp>0&&give(x,'terror',1));if(out.has('doomJump')&&f.st?.doom){const x=BAT.foes.find(y=>y.hp>0);if(x)give(x,'doom',3,f.st.doom.b||p.atk);}}
+  if(o.skill&&(out.has('cleanse')||out.has('healSh'))&&Math.random()<.2){const q=RUN.party.find(q=>q.hp>0&&Object.keys(q.st||{}).some(s=>NEG instanceof Set?NEG.has(s):NEG&&NEG[s]));if(q){const s2=Object.keys(q.st).find(s=>NEG instanceof Set?NEG.has(s):NEG[s]);delete q.st[s2];if(out.has('healSh'))q.sh=(q.sh||0)+Math.round(q.maxhp*.05);}}
+  // 污染第5階 嫉妒：施技時複製隊友身上一個增益
+  if(rb210(h)&&o.skill&&tier253()>=4&&!p.env270){p.env270=1;const q=RUN.party.find(q=>q!==p&&q.hp>0&&q.st&&Object.keys(q.st).some(s=>!(NEG instanceof Set?NEG.has(s):NEG&&NEG[s])));if(q){const s2=Object.keys(q.st).find(s=>!(NEG instanceof Set?NEG.has(s):NEG&&NEG[s]));try{give(p,s2,2+1);}catch(e){}}}
+  return r;}}}catch(e){console.warn(e)}return HIT270B(f,p,m,o);};
+// 持久：受傷 -10%；羽幕：被打時 25% 致盲攻擊者
+const HURT270=hurtAlly;hurtAlly=function(p,raw,...a){try{const h=S.heroes.find(x=>x.id===p.id);if(h&&h.fin270===2)raw=Math.round(raw*.9);if(mechs270(p).out.has('blindBack')&&Math.random()<.25&&BAT){const f=BAT.foes.find(x=>x.hp>0);if(f)give(f,'blind',1);}}catch(e){}return HURT270(p,raw,...a);};
+// 污染第9階：20% 額外行動；嫉妒每回合重置
+const AA270=allyAct;allyAct=function(p,...a){const r=AA270(p,...a);try{p.env270=0;const h=S.heroes.find(x=>x.id===p.id);if(h&&rb210(h)&&tier253()>=8&&!p.extra270&&BAT&&p.hp>0&&BAT.foes.some(f=>f.hp>0)&&Math.random()<.2){p.extra270=1;blog((p.name||short(p.key))+' 被瘋癲推動，多行動一次。');try{AA270(p,...a);}finally{p.extra270=0;}}}catch(e){}return r;};
+// 重鑄券掉落：回憶房／活動首領勝利 25%
+const FB270R=finishBattle;finishBattle=function(win,...a){try{if(win&&RUN&&(RUN.mem||BAT&&BAT.dom)&&Math.random()<.25){S.recast270=(S.recast270||0)+1;toast('獲得重鑄券');}}catch(e){}return FB270R(win,...a);};
+CHBOOK.push([()=>true,'手冊・v2.7 技能與裝備','技能分支 Lv50～80 逐步開放，每技能可選 強化（數值）／轉化（改附職業狀態）／連動（施放後下一個不同技能加成 20%）；同型分支有數量上限。Lv60 依最多的分支型得到流派印記；Lv75、Lv80 各一次終極選擇，選後鎖定，可用重鑄券（回憶房／活動首領掉落）重置。天賦：Lv13 為對特定狀態的收割加傷，Lv20 為機制效果。中毒上限 6 層（蕁、鳶 8 層），毒爆附禁療、5 層以上可能麻痺。標記全隊 +10%。污染階對重生角色：2 緩速、3 扣血、4 技能 ×1.3、5 嫉妒複製增益、6 低血加傷與冷卻 −1、8 首擊必暴與易傷、9 瘋癲 20% 額外行動。6 件套：毒牙／血契／印章／霜蝕／焰紋／裂甲／夜行／荊棘 對應狀態加傷。新詞條「領主傷害增強」。']);
 const VER='v2.7.0-test';
-AUTHOR_ANN155.unshift(['v2.7.0-test',['技能分支 Lv50～80 逐步開放並互斥；連段與跨職業狀態搭配（標記、流血、中毒、麻痺、恐懼…）。','中毒上限6層（蕁／鳶8層），毒爆附禁療與麻痺。','污染階對重生角色的技能變化與代價。','怪物強度依隊伍戰力（等級＋裝備＋重生）與污染統一提升；取消護盾上限。','樂子點與異界點收益提高：完成 +40%、未完成／失敗 +60%。','裝備：新詞條「領主傷害增強」；史詩保留較小的特殊效果；特色／傳說隨等級重算（只升不降）；洗練含基礎數值；淬煉追加隨機詞條。']]);AUTHOR_ANN155.unshift(['v2.5.1-test',['測試版：補回70張戰鬥特效／狀態圖示與時裝目錄（art/effects/v220、art/costumes）。','新增〈內心的惡魔〉限時活動預告面板（即將開放，僅展示圖片）。','流派試煉套用與主線相同的重生難度強化。','重生前自動備份存檔；重生會讓主線地圖回到第一層、技能依等級重新取得。','萬相套裝 2／4／6 件效果小幅加強；兌換券顯示名稱統一為「混沌券」。']]);AUTHOR_ANN155.unshift(['v2.5.3-test',['第四章〈六芒門前〉移入主線：地窖第 20～24 層，新怪物滑槽蜈蚣、回音籤影、氣閥獵犬；第 22 層管線守衛、第 24 層六角驗印機（含二階段與倒下圖）。調查入口移到地窖入口，大廳按鈕移除。','鍛鍊房回歸，入口在候燈迴廊。','重生不再重置地圖與技能，只推進劇情；重生前仍會備份存檔。','長槍手與白骨先生時裝換成動態圖。','九階慾望難度：我想看你努力、執念、貪慾、惡慾、食慾、色慾、傲慢、墮落、瘋癲，每重生一次開一階；每階有自己的戰鬥規則，前面的階會以殘響疊加。','怪物等級真的會提高數值（防禦、速度、抗性，Lv30 起護盾），重生後怪物生命 ×1.25、攻擊 ×1.15；第四章怪物至少 Lv60。','世界王：最多八人、不限回合，每升一階掉落 +12%。','語嫣房「主宰」：新的三階段與結局；未解鎖時顯示還缺哪幾間。','重生劇情延長，各階慾望有不同的低語與事件。','〈內心的惡魔〉限時活動開放：活動與巡夜卡片進入，每天三次，異界點可換時裝與套裝。','回憶房改用首領記錄，補上地址之門、第四章與白鐵礦城的領主。']]);
+AUTHOR_ANN155.unshift(['v2.7.0-test',['技能分支 Lv50～80 逐步開放並互斥；連段與跨職業狀態搭配（標記、流血、中毒、麻痺、恐懼…）。','中毒上限6層（蕁／鳶8層），毒爆附禁療與麻痺。','污染階對重生角色的技能變化與代價。','怪物強度依隊伍戰力（等級＋裝備＋重生）與污染統一提升；取消護盾上限。','天賦全面改寫（23 職業 Lv13 收割型／Lv20 機制型）；分支三型 強化／轉化／連動；Lv60 流派印記；Lv75／80 終極選擇；重鑄券。','污染第5階嫉妒、第9階瘋癲額外行動；6件套專屬連動。','樂子點與異界點收益提高：完成 +40%、未完成／失敗 +60%。','裝備：新詞條「領主傷害增強」；史詩保留較小的特殊效果；特色／傳說隨等級重算（只升不降）；洗練含基礎數值；淬煉追加隨機詞條。']]);AUTHOR_ANN155.unshift(['v2.5.1-test',['測試版：補回70張戰鬥特效／狀態圖示與時裝目錄（art/effects/v220、art/costumes）。','新增〈內心的惡魔〉限時活動預告面板（即將開放，僅展示圖片）。','流派試煉套用與主線相同的重生難度強化。','重生前自動備份存檔；重生會讓主線地圖回到第一層、技能依等級重新取得。','萬相套裝 2／4／6 件效果小幅加強；兌換券顯示名稱統一為「混沌券」。']]);AUTHOR_ANN155.unshift(['v2.5.3-test',['第四章〈六芒門前〉移入主線：地窖第 20～24 層，新怪物滑槽蜈蚣、回音籤影、氣閥獵犬；第 22 層管線守衛、第 24 層六角驗印機（含二階段與倒下圖）。調查入口移到地窖入口，大廳按鈕移除。','鍛鍊房回歸，入口在候燈迴廊。','重生不再重置地圖與技能，只推進劇情；重生前仍會備份存檔。','長槍手與白骨先生時裝換成動態圖。','九階慾望難度：我想看你努力、執念、貪慾、惡慾、食慾、色慾、傲慢、墮落、瘋癲，每重生一次開一階；每階有自己的戰鬥規則，前面的階會以殘響疊加。','怪物等級真的會提高數值（防禦、速度、抗性，Lv30 起護盾），重生後怪物生命 ×1.25、攻擊 ×1.15；第四章怪物至少 Lv60。','世界王：最多八人、不限回合，每升一階掉落 +12%。','語嫣房「主宰」：新的三階段與結局；未解鎖時顯示還缺哪幾間。','重生劇情延長，各階慾望有不同的低語與事件。','〈內心的惡魔〉限時活動開放：活動與巡夜卡片進入，每天三次，異界點可換時裝與套裝。','回憶房改用首領記錄，補上地址之門、第四章與白鐵礦城的領主。']]);
 AUTHOR_ANN155.unshift(['v2.6.0-test',['怪物等級真正生效：等級跟隨隊伍（精英+2、首領+3），生命／攻擊／防禦依等級成長；第四章最低 Lv60。','九階慾望難度倍率改為取代舊難度加成（不再疊乘），單次受擊上限防止滿血秒殺。','污染技能整合為八層專屬技能；修正封印、閃避、狂怒、侵蝕 NaN，新增狀態「麻痺」。','23 位職業各新增一招 Lv15 技能與 Lv30 天賦「異界回聲」：帶回標記、恐懼、影步、掩護、頂盾，並加入禁療與麻痺。','新套裝「污染・八相」「管線」，22 組舊套裝加上狀態效果，16 件新橘字（含 8 件污染裝備）；舊裝備全部保留。']]);
 AUTHOR_ANN155.unshift(['v2.5.2-test',['測試版改用獨立存檔（RG_TEST_ 開頭），第一次開啟會複製正式版存檔，之後不會再寫回正式版。','〈內心的惡魔〉預告移到主畫面橫幅與「三房・傳送門・活動」裡。','重生頁說明改成新規則。']]);const ANN=AUTHOR_ANN155;
 function annSeen(){try{return RGLS.getItem('rg_ann')===VER}catch(e){return true}}
