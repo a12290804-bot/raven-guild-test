@@ -20,7 +20,7 @@
       "line": "燈上多了幾隻眼睛，也不代表它會替你認路。",
       "published": true,
       "images": {
-        "normal": "art/costumes/mageF_costume241.jpg"
+        "normal": "art/costumes/mageF_costume280.gif"
       }
     },
     {
@@ -42,7 +42,18 @@
       "line": "鈴聲聽著不同了？先站穩，再慢慢分辨。",
       "published": true,
       "images": {
-        "normal": "art/costumes/luoqingluan_costume241.jpg"
+        "normal": "art/costumes/luoqingluan_costume280.gif"
+      }
+    },
+    {
+      "id": "raven_241",
+      "hero": "raven",
+      "name": "猩紅鴉羽",
+      "theme": "污染與猩紅",
+      "line": "羽毛染紅了，箭還是往同一個方向飛。",
+      "published": true,
+      "images": {
+        "normal": "art/costumes/raven_costume280.gif"
       }
     }
   ]
